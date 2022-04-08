@@ -1,72 +1,70 @@
-let canvas = document.querySelector("game-container");
+let canvas = document.querySelector("canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let c = canvas.getContext("2d");
-
-// Startläge kvadraterna
-// Slumpas fram med lite marginal från kanterna
-// (minst 200 px till vänstermarginal, max 20 % av bredd till högermarginal)
-let xPosRed = Math.floor(Math.random() * (0.8 * canvas.width - 200) + 200);
-let yPosRed = Math.floor(Math.random() * (0.8 * canvas.height - 200) + 200);
-let xPosYellow = Math.floor(Math.random() * (0.8 * canvas.width - 100) + 100);
-let yPosYellow = Math.floor(Math.random() * (0.8 * canvas.height - 100) + 100);
-
-// Hastighet för respektive kvadrat, i x- och y-led
-// kan slumpas fram inom lämpligt intervall enl. samma metod som startläget.
-let dxRed = 3;
-let dyRed = 4;
-let dxYellow = 5;
-let dyYellow = 3;
-
-// Sidlängd för respektive kvadrat
-const sizeRed = 30;
-const sizeYellow = 30;
-
-// Variabler som håller reda på respektive kvadrats mittkoordinat
-let xCenterRed = (xPosRed + xPosRed + sizeRed) / 2;
-let yCenterRed = (yPosRed + yPosRed + sizeRed) / 2;
-let xCenterYellow = (xPosYellow + xPosYellow + sizeYellow) / 2;
-let yCenterYellow = (yPosYellow + yPosYellow + sizeYellow) / 2;
+const c = canvas.getContext("2d");
+const midX = canvas.width / 2;
+const midY = canvas.height / 2;
+const width = canvas.width
+const height = canvas.height
 
 // Variabler för tidsmätning
-let ticks = 0;
-let runtime = 0;
+var ticks = 0;
+var runtime = 0;
 const updateFrequency = 10; // millisekunder per steg
 
-// Variabler som håller koll på antalet studsar
-let redBounces = 0;
-let yellowBounces = 0;
+var mousePos = {
+    x: midX,
+    y: midY
+};
+
+
 
 // Reagerar på tangenttryckningar
 // Varje tangent har sin keycode, se https://keycode.info
 document.onkeydown = function (e) {
-  const key = e.key;
+  const key = e.code;
   switch (key) {
-    case "ä":
-      console.log("Röd kvadrat ska byta riktning i x-led");
+    case "Space":
+      console.log("Vessel boost initiated");
       break;
-    case "ö":
-      console.log("Röd kvadrat ska byta riktning i y-led");
+    case "KeyF":
+      console.log("Laser turrets fired");
       break;
-    case "a":
-      console.log("Gul kvadrat ska byta riktning i x-led");
-      break;
-    case "s":
-      console.log("Gul kvadrat ska byta riktning i y-led");
-      break;
-    case " ": // Mellanslag
-      console.log(`Runtime: ${runtime} sekunder.`);
-      break;
-    default:
-      console.log("Tangenten använd inte");
   }
 };
 
-let myTimer = setInterval(drawRects, updateFrequency);
+document.onmousemove = function (e) {
+    mousePos = getMousePos(canvas, e)
+};
 
-// Ritar upp kvadraterna
-function drawRects() {
+function getMousePos(canvas, evt) {
+    let rect = canvas.getBoundingClientRect(), // abs. size of element
+      scaleX = canvas.width / rect.width,    // relationship bitmap vs. element for x
+      scaleY = canvas.height / rect.height;  // relationship bitmap vs. element for y
+  
+    return {
+      x: (evt.clientX - rect.left) * scaleX,   // scale mouse coordinates after they have
+      y: (evt.clientY - rect.top) * scaleY     // been adjusted to be relative to element
+    }
+  }
+
+let gameLoop = setInterval(mainLoop, updateFrequency);
+
+function mainLoop() {
+    ticks += 1;
+    runtime = (ticks/1000) * updateFrequency;
+    console.log(mousePos)
+    // update();
+    // render();
+
+}
+
+function update() {
+    
+}
+
+function render() {
   // Håller koll på tiden som programmet varit igång
   ticks += 1;
   runtime = (ticks / 1000) * updateFrequency; // i sekunder
